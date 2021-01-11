@@ -42,9 +42,8 @@ public class Main {
 		allCompanyNames = companyNamesFromExcel(0);
 		for (int i = 0; i < 3; i++) {
 			companyNames = companyNamesFromExcel(i + 1);
-			System.out.println(companyNames);
-			// yahooAPIConnect();
-			// displayData();
+			yahooAPIConnect();
+			displayData();
 		}
 
 		for (String name : allCompanyNames) {
