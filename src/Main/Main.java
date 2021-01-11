@@ -40,18 +40,11 @@ public class Main {
 
 		initializeExcel();
 		allCompanyNames = companyNamesFromExcel(0);
-		for (int i = 0; i < 3; i++) {
-			companyNames = companyNamesFromExcel(i + 1);
+		for (int i = 1; i < 6; i++) {
+			companyNames = companyNamesFromExcel(i);
 			yahooAPIConnect();
 			displayData();
-		}
-
-		for (String name : allCompanyNames) {
-			Row row = rawSheet.createRow(rawSheet.getLastRowNum() + 1);
-			row.createCell(0).setCellValue(name);
-			row.createCell(1).setCellValue(new Timestamp(System.currentTimeMillis()).toString());
-			FileOutputStream outputStream = new FileOutputStream(excelFile);
-			workbook.write(outputStream);
+			writeDataExcel();
 		}
 
 		workbook.close();
@@ -88,6 +81,35 @@ public class Main {
 			}
 
 		}
+	}
+
+	static void writeDataExcel() throws IOException {
+		for (int i = 0; i < results.length(); i++) {
+			try {
+				float price = httpResponse.getJSONObject("quoteResponse").getJSONArray("result").getJSONObject(i)
+						.getFloat("regularMarketPrice");
+				float targetMean = httpResponse.getJSONObject("quoteResponse").getJSONArray("result").getJSONObject(i)
+						.getFloat("targetPriceMean");
+				Row row = rawSheet.createRow(rawSheet.getLastRowNum() + 1);
+				row.createCell(0).setCellValue(companyNames.get(i));
+				row.createCell(1).setCellValue(price);
+				row.createCell(2).setCellValue(targetMean);
+				row.createCell(3).setCellValue(targetMean-price);
+				row.createCell(4).setCellValue(new Timestamp(System.currentTimeMillis()).toString());
+
+			}
+
+			catch (Exception e) {
+				Row row = rawSheet.createRow(rawSheet.getLastRowNum() + 1);
+				row.createCell(0).setCellValue(companyNames.get(i));
+				row.createCell(4).setCellValue(new Timestamp(System.currentTimeMillis()).toString());
+			}
+
+			FileOutputStream outputStream = new FileOutputStream(excelFile);
+			workbook.write(outputStream);
+
+		}
+
 	}
 
 	static String namesToHTTPS() {
